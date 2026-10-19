@@ -1,0 +1,115 @@
+/* Estilos da demo do antd, escopados em .antd-demo para não vazar no resto do app. */
+
+.antd-demo .plan-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.antd-demo .plan-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4338ca;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.antd-demo .plan-title {
+  display: block;
+  margin-top: 10px;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.antd-demo .plan-price {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+.antd-demo .plan-price small {
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.antd-demo .plan-benefits {
+  list-style: none;
+  padding-left: 0;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.antd-demo .plan-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.antd-demo .plan-benefits li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6366f1;
+  flex-shrink: 0;
+}
+
+.antd-demo .plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.antd-demo .plan-ok {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #16a34a;
+}
+
+.antd-demo .designer-box {
+  margin-top: 12px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.antd-demo .designer-option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.antd-demo .designer-option small {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* O pedido do designer (12px de raio, cor própria, outra sombra):
+   briga com a classe interna do antd — sem !important o estilo do componente ganha. */
+.antd-demo .botao-designer {
+  border-radius: 12px !important;
+  background: #0e7490 !important;
+  border-color: #0e7490 !important;
+  color: #fff !important;
+  box-shadow: 0 6px 14px rgba(14, 116, 144, 0.35) !important;
+  font-weight: 700 !important;
+}
+
+.antd-demo .botao-designer:hover {
+  background: #155e75 !important;
+  border-color: #155e75 !important;
+}

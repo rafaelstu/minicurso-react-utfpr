@@ -192,8 +192,9 @@ export function FormBadUseState() {
 
   const field = { marginBottom: 8 } as const;
 
+  // noValidate: a validação é didática (ifs/Zod), não a bolha nativa do browser.
   return (
-    <form onSubmit={handleSubmit} className="card">
+    <form onSubmit={handleSubmit} className="card" noValidate>
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
         <strong>useState (ruim) — 40+ estados, tudo re-renderiza</strong>
         <RenderCounter label="renders do form" />
@@ -212,11 +213,11 @@ export function FormBadUseState() {
       <div style={field}><RenderCounter label="cpf" /><HeavyField placeholder="CPF 000.000.000-00" value={cpf} onChange={(e) => setCpf(e.target.value)} /></div>
       <div style={field}><RenderCounter label="rg" /><HeavyField placeholder="RG" value={rg} onChange={(e) => setRg(e.target.value)} /></div>
       <div style={field}><RenderCounter label="sexo" />
-        <select className="heavy-field" value={gender} onChange={(e) => setGender(e.target.value)}>
+        <select className="heavy-field" aria-label="Sexo" value={gender} onChange={(e) => setGender(e.target.value)}>
           <option value="">Sexo…</option><option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option>
         </select></div>
       <div style={field}><RenderCounter label="civil" />
-        <select className="heavy-field" value={maritalStatus} onChange={(e) => setMaritalStatus(e.target.value)}>
+        <select className="heavy-field" aria-label="Estado civil" value={maritalStatus} onChange={(e) => setMaritalStatus(e.target.value)}>
           <option value="">Estado civil…</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option>
         </select></div>
       <div style={field}><RenderCounter label="nac" /><HeavyField placeholder="Nacionalidade" value={nationality} onChange={(e) => setNationality(e.target.value)} /></div>
@@ -224,12 +225,12 @@ export function FormBadUseState() {
       <div style={field}><RenderCounter label="pai" /><HeavyField placeholder="Nome do pai (opcional)" value={fatherName} onChange={(e) => setFatherName(e.target.value)} /></div>
 
       <h4>Contato</h4>
-      <div style={field}><RenderCounter label="email-p" /><HeavyField placeholder="E-mail pessoal" value={personalEmail} onChange={(e) => setPersonalEmail(e.target.value)} /></div>
-      <div style={field}><RenderCounter label="email-c" /><HeavyField placeholder="E-mail corporativo" value={workEmail} onChange={(e) => setWorkEmail(e.target.value)} /></div>
-      <div style={field}><RenderCounter label="tel" /><HeavyField placeholder="Telefone (41) 3333-3333" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
-      <div style={field}><RenderCounter label="cel" /><HeavyField placeholder="Celular (41) 99999-9999" value={mobile} onChange={(e) => setMobile(e.target.value)} /></div>
+      <div style={field}><RenderCounter label="email-p" /><HeavyField type="email" placeholder="E-mail pessoal" value={personalEmail} onChange={(e) => setPersonalEmail(e.target.value)} /></div>
+      <div style={field}><RenderCounter label="email-c" /><HeavyField type="email" placeholder="E-mail corporativo" value={workEmail} onChange={(e) => setWorkEmail(e.target.value)} /></div>
+      <div style={field}><RenderCounter label="tel" /><HeavyField type="tel" placeholder="Telefone (41) 3333-3333" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+      <div style={field}><RenderCounter label="cel" /><HeavyField type="tel" placeholder="Celular (41) 99999-9999" value={mobile} onChange={(e) => setMobile(e.target.value)} /></div>
       <div style={field}><RenderCounter label="emg-n" /><HeavyField placeholder="Emergência: nome" value={emergencyName} onChange={(e) => setEmergencyName(e.target.value)} /></div>
-      <div style={field}><RenderCounter label="emg-t" /><HeavyField placeholder="Emergência: telefone" value={emergencyPhone} onChange={(e) => setEmergencyPhone(e.target.value)} /></div>
+      <div style={field}><RenderCounter label="emg-t" /><HeavyField type="tel" placeholder="Emergência: telefone" value={emergencyPhone} onChange={(e) => setEmergencyPhone(e.target.value)} /></div>
 
       <h4>Endereço</h4>
       <div style={field}><RenderCounter label="cep" /><HeavyField placeholder="CEP 00000-000" value={zip} onChange={(e) => setZip(e.target.value)} /></div>
@@ -246,11 +247,11 @@ export function FormBadUseState() {
       <div style={field}><RenderCounter label="sal" /><HeavyField placeholder="Salário (ex. 5000)" value={salary} onChange={(e) => setSalary(e.target.value)} /></div>
       <div style={field}><RenderCounter label="adm" /><HeavyField type="date" value={hireDate} onChange={(e) => setHireDate(e.target.value)} aria-label="Data de admissão" /></div>
       <div style={field}><RenderCounter label="contrato" />
-        <select className="heavy-field" value={contractType} onChange={(e) => setContractType(e.target.value)}>
+        <select className="heavy-field" aria-label="Tipo de contrato" value={contractType} onChange={(e) => setContractType(e.target.value)}>
           <option value="">Tipo de contrato…</option><option>CLT</option><option>PJ</option><option>Estágio</option><option>Aprendiz</option>
         </select></div>
       <div style={field}><RenderCounter label="regime" />
-        <select className="heavy-field" value={workMode} onChange={(e) => setWorkMode(e.target.value)}>
+        <select className="heavy-field" aria-label="Regime de trabalho" value={workMode} onChange={(e) => setWorkMode(e.target.value)}>
           <option value="">Regime…</option><option>Presencial</option><option>Híbrido</option><option>Remoto</option>
         </select></div>
       <div style={field}><RenderCounter label="gestor" /><HeavyField placeholder="Gestor" value={manager} onChange={(e) => setManager(e.target.value)} /></div>
@@ -260,7 +261,7 @@ export function FormBadUseState() {
       <div style={field}><RenderCounter label="ag" /><HeavyField placeholder="Agência" value={agency} onChange={(e) => setAgency(e.target.value)} /></div>
       <div style={field}><RenderCounter label="conta" /><HeavyField placeholder="Conta" value={account} onChange={(e) => setAccount(e.target.value)} /></div>
       <div style={field}><RenderCounter label="tipo-c" />
-        <select className="heavy-field" value={accountType} onChange={(e) => setAccountType(e.target.value)}>
+        <select className="heavy-field" aria-label="Tipo de conta" value={accountType} onChange={(e) => setAccountType(e.target.value)}>
           <option value="">Tipo de conta…</option><option>Corrente</option><option>Poupança</option><option>Salário</option>
         </select></div>
 
@@ -269,11 +270,11 @@ export function FormBadUseState() {
         <div key={i} className="card" style={{ marginBottom: 8 }}>
           <RenderCounter label={`dep ${i + 1}`} />
           <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
-            <HeavyField placeholder="Nome" value={dep.name} onChange={(e) => setDependents((ds) => ds.map((d, j) => (j === i ? { ...d, name: e.target.value } : d)))} />
-            <select className="heavy-field" value={dep.kinship} onChange={(e) => setDependents((ds) => ds.map((d, j) => (j === i ? { ...d, kinship: e.target.value } : d)))}>
+            <HeavyField placeholder="Nome" aria-label={`Nome do dependente ${i + 1}`} value={dep.name} onChange={(e) => setDependents((ds) => ds.map((d, j) => (j === i ? { ...d, name: e.target.value } : d)))} />
+            <select className="heavy-field" aria-label={`Parentesco do dependente ${i + 1}`} value={dep.kinship} onChange={(e) => setDependents((ds) => ds.map((d, j) => (j === i ? { ...d, kinship: e.target.value } : d)))}>
               <option value="">Parentesco…</option><option>Filho(a)</option><option>Cônjuge</option><option>Enteado(a)</option><option>Outro</option>
             </select>
-            <HeavyField type="date" value={dep.birthDate} onChange={(e) => setDependents((ds) => ds.map((d, j) => (j === i ? { ...d, birthDate: e.target.value } : d)))} aria-label="Nascimento do dependente" />
+            <HeavyField type="date" value={dep.birthDate} onChange={(e) => setDependents((ds) => ds.map((d, j) => (j === i ? { ...d, birthDate: e.target.value } : d)))} aria-label={`Nascimento do dependente ${i + 1}`} />
             <button type="button" className="btn" onClick={() => setDependents((ds) => ds.filter((_, j) => j !== i))}>Remover</button>
           </div>
         </div>
@@ -290,11 +291,11 @@ export function FormBadUseState() {
 
       <button type="submit" className="btn btn-good" style={{ marginTop: 12 }}>Validar cadastro</button>
       {errors.length > 0 && (
-        <ul style={{ color: "#b91c1c", fontSize: 14 }}>
+        <ul role="alert" style={{ color: "#b91c1c", fontSize: 14 }}>
           {errors.map((er, i) => <li key={i}>{er}</li>)}
         </ul>
       )}
-      {ok && <p style={{ color: "#15803d", fontWeight: 700 }}>{ok}</p>}
+      {ok && <p role="status" style={{ color: "#15803d", fontWeight: 700 }}>{ok}</p>}
     </form>
   );
 }

@@ -79,12 +79,14 @@ export function MutationDemo() {
             <input
               className="heavy-field"
               placeholder="Título"
+              aria-label="Título do post"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
               className="heavy-field"
               placeholder="Conteúdo"
+              aria-label="Conteúdo do post"
               rows={3}
               value={body}
               onChange={(e) => setBody(e.target.value)}
@@ -104,7 +106,7 @@ export function MutationDemo() {
               (invalidação → refetch).
             </p>
           )}
-          {create.isError && <p className="err">{String(create.error)}</p>}
+          {create.isError && <p className="err" role="alert">{String(create.error)}</p>}
         </div>
 
         <div className="card">

@@ -67,6 +67,7 @@ export function ContextBad() {
           <input
             className="heavy-field"
             style={{ maxWidth: 260 }}
+            aria-label="Digite aqui para testar o ticker"
             placeholder="Digite aqui com o ticker ligado…"
             value={probe}
             onChange={(e) => setProbe(e.target.value)}

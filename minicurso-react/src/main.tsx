@@ -13,9 +13,13 @@ const queryClient = new QueryClient({
   },
 });
 
+// O botão flutuante do Devtools atrapalha a apresentação e cobre o FpsMeter.
+// Fica disponível só quando explicitamente pedido: ?devtools
+const showDevtools = new URLSearchParams(window.location.search).has("devtools");
+
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <App />
-    <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+    {showDevtools && <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />}
   </QueryClientProvider>,
 );

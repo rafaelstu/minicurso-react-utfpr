@@ -12,15 +12,18 @@ import {
 
 export function CodeBlock({ code, fileName }: { code: string; fileName: string }) {
   const [copied, setCopied] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
+      setMessage("Código copiado.");
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      // clipboard bloqueado (contexto não seguro) — ignora
+      setMessage("Não deu para copiar. Selecione o código e use Ctrl+C.");
     }
+    window.setTimeout(() => setMessage(""), 3000);
   }
 
   return (
@@ -42,9 +45,14 @@ export function CodeBlock({ code, fileName }: { code: string; fileName: string }
           </DialogDescription>
         </DialogHeader>
         <div className="code-modal-wrap">
-          <button type="button" className="btn code-modal-copy" onClick={copy}>
-            {copied ? "Copiado!" : "Copiar"}
-          </button>
+          <div className="code-modal-toolbar">
+            <button type="button" className="btn code-modal-copy" onClick={copy}>
+              {copied ? "Copiado!" : "Copiar"}
+            </button>
+            <span className="sr-only" role="status" aria-live="polite">
+              {message}
+            </span>
+          </div>
           <pre className="code-modal">{code}</pre>
         </div>
       </DialogContent>

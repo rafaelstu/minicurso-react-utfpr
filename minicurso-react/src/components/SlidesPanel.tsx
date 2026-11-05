@@ -42,7 +42,11 @@ export function SlidesPanel({
   const [error, setError] = useState<string | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
-  const [size, setSize] = useState({ w: 460, h: 300 });
+  // clientWidth/Height descontam a barra de rolagem (innerWidth não desconta).
+  const [size, setSize] = useState(() => ({
+    w: Math.min(460, Math.max(280, document.documentElement.clientWidth - 24)),
+    h: Math.min(300, Math.max(180, document.documentElement.clientHeight - 116)),
+  }));
 
   // Baixa o pdf.js e o PDF — só quando o painel abre (não pesa o bundle inicial)
   useEffect(() => {
@@ -82,6 +86,30 @@ export function SlidesPanel({
     setWidth(wrap.clientWidth);
     return () => ro.disconnect();
   }, []);
+
+  // Ao girar a tela ou redimensionar a janela, mantém a janelinha dentro da tela.
+  useEffect(() => {
+    if (!floating) return;
+    const onResize = () => {
+      const vw = document.documentElement.clientWidth;
+      const vh = document.documentElement.clientHeight;
+      setSize((s) => ({
+        w: Math.min(s.w, Math.max(260, vw - 24)),
+        h: Math.min(s.h, Math.max(180, vh - 116)),
+      }));
+      setPos((p) => {
+        if (!p) return p;
+        const w = floatRef.current?.offsetWidth ?? 260;
+        const h = floatRef.current?.offsetHeight ?? 180;
+        return {
+          x: Math.min(p.x, Math.max(8, vw - w - 8)),
+          y: Math.min(p.y, Math.max(8, vh - h - 8)),
+        };
+      });
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [floating]);
 
   // Sincroniza o estado do botão de tela cheia (o Esc sai por fora)
   useEffect(() => {
@@ -164,9 +192,11 @@ export function SlidesPanel({
     if (!dragRef.current || !floatRef.current) return;
     const w = floatRef.current.offsetWidth;
     const h = floatRef.current.offsetHeight;
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
     setPos({
-      x: Math.min(Math.max(e.clientX - dragRef.current.dx, 0), window.innerWidth - w),
-      y: Math.min(Math.max(e.clientY - dragRef.current.dy, 0), window.innerHeight - h),
+      x: Math.min(Math.max(e.clientX - dragRef.current.dx, 8), Math.max(8, vw - w - 8)),
+      y: Math.min(Math.max(e.clientY - dragRef.current.dy, 8), Math.max(8, vh - h - 8)),
     });
   }
 
@@ -188,9 +218,12 @@ export function SlidesPanel({
   function onResizePointerMove(e: ReactPointerEvent<HTMLDivElement>) {
     const s = resizeRef.current;
     if (!s) return;
+    // Não deixa o painel passar da borda da tela (nem no mobile).
+    const maxW = Math.max(260, document.documentElement.clientWidth - (pos?.x ?? 12) - 12);
+    const maxH = Math.max(180, document.documentElement.clientHeight - (pos?.y ?? 104) - 12);
     setSize({
-      w: Math.max(260, Math.min(s.w + (e.clientX - s.x), window.innerWidth)),
-      h: Math.max(180, Math.min(s.h + (e.clientY - s.y), window.innerHeight)),
+      w: Math.max(260, Math.min(s.w + (e.clientX - s.x), maxW)),
+      h: Math.max(180, Math.min(s.h + (e.clientY - s.y), maxH)),
     });
   }
 
@@ -217,14 +250,26 @@ export function SlidesPanel({
         <strong>Slides</strong>
         <span className="muted slides-hint">← → trocam de página</span>
         <div className="slides-controls">
-          <button type="button" className="btn slides-btn" onClick={onPrev} aria-label="Página anterior">
+          <button
+            type="button"
+            className="btn slides-btn"
+            onClick={onPrev}
+            aria-label="Página anterior"
+            disabled={total === 0}
+          >
             ◀
           </button>
-          <span className="slides-page">
+          <span className="slides-page" aria-live="polite">
             p. {page}
             {total > 0 ? ` / ${total}` : ""}
           </span>
-          <button type="button" className="btn slides-btn" onClick={onNext} aria-label="Próxima página">
+          <button
+            type="button"
+            className="btn slides-btn"
+            onClick={onNext}
+            aria-label="Próxima página"
+            disabled={total === 0}
+          >
             ▶
           </button>
           <button
@@ -250,14 +295,26 @@ export function SlidesPanel({
           </button>
         </div>
       </div>
-      <div ref={wrapRef} className="slides-canvas-wrap">
+      <div
+        ref={wrapRef}
+        className="slides-canvas-wrap"
+        aria-busy={total === 0 && !error}
+      >
+        <canvas
+          ref={canvasRef}
+          className="slides-canvas"
+          role="img"
+          aria-label={total > 0 ? `Slide ${page} de ${total}` : "Slides carregando"}
+        />
         {error ? (
-          <p className="muted" style={{ padding: 16 }}>
+          <p className="slides-status" role="alert">
             {error}
           </p>
-        ) : (
-          <canvas ref={canvasRef} className="slides-canvas" />
-        )}
+        ) : total === 0 ? (
+          <p className="slides-status" role="status">
+            Carregando slides…
+          </p>
+        ) : null}
       </div>
     </aside>
   );

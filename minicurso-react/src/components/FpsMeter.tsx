@@ -30,9 +30,13 @@ export function FpsMeter({ position = "right" }: { position?: "right" | "left" }
       title="Frames por segundo (requestAnimationFrame)"
       style={{
         position: "fixed",
-        ...(position === "left" ? { left: 12 } : { right: 12 }),
+        // "left" é usado quando os slides estão abertos: 72px do rail + 12px.
+        ...(position === "left" ? { left: 84 } : { right: 12 }),
         bottom: 12,
-        zIndex: 50,
+        // Abaixo da bottom sheet mobile (35) e do modal; acima do conteúdo.
+        zIndex: 34,
+        // Só informa: não pode bloquear cliques no conteúdo atrás do badge.
+        pointerEvents: "none",
         fontFamily: "ui-monospace, Consolas, monospace",
         fontSize: 13,
         fontWeight: 700,

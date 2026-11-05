@@ -28,12 +28,11 @@ export function DataDemo() {
         persiste). Mesma tela e mesma API nas duas versões — muda só quem consome.
       </p>
 
-      <div className="tabs" role="tablist" aria-label="Versões de dados">
+      <div className="tabs" role="group" aria-label="Versões de dados">
         {TABS.map((t) => (
           <button
             key={t.id}
-            role="tab"
-            aria-selected={tab === t.id}
+            aria-pressed={tab === t.id}
             className={`tab ${tab === t.id ? "active" : ""}`}
             onClick={() => setTab(t.id)}
           >

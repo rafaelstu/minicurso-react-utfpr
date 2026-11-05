@@ -82,6 +82,8 @@ export function AntdDemo() {
       >
         <p style={{ marginTop: 0 }}>Enviamos o link de ativação para este e-mail.</p>
         <Input
+          type="email"
+          aria-label="E-mail para ativação"
           placeholder="voce@empresa.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

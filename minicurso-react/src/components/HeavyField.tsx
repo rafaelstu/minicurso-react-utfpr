@@ -25,5 +25,15 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
 // então o custo só paga uma vez. É isso que medimos.
 export const HeavyField = memo(function HeavyField({ costMs = HEAVY_FIELD_COST_MS, ref, ...rest }: Props) {
   burn(costMs);
-  return <input ref={ref} {...rest} className={`heavy-field ${rest.className ?? ""}`} />;
+  const { "aria-label": ariaLabel, className, ...inputProps } = rest;
+  // O placeholder é a única pista visual do campo nestas demos; usa ele como
+  // nome acessível quando não houver um aria-label explícito.
+  return (
+    <input
+      ref={ref}
+      {...inputProps}
+      aria-label={ariaLabel ?? inputProps.placeholder}
+      className={`heavy-field ${className ?? ""}`}
+    />
+  );
 });

@@ -65,7 +65,7 @@ export function FormRhfController() {
   );
 
   return (
-    <form className="card" onSubmit={handleSubmit(onValid, onInvalid)}>
+    <form className="card" onSubmit={handleSubmit(onValid, onInvalid)} noValidate>
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
         <strong>RHF + Controller + Zod (mercado)</strong>
         <RenderCounter label="renders do form" />
@@ -79,44 +79,44 @@ export function FormRhfController() {
 
       <h4>Dados pessoais <AgePreview control={control} /></h4>
       <div className="form-grid">
-        <div><HeavyField placeholder="Nome completo" {...register("fullName")} /><small className="err">{errors.fullName?.message}</small></div>
+        <div><HeavyField placeholder="Nome completo" {...register("fullName")} /><small className="err" role="alert">{errors.fullName?.message}</small></div>
         <div><HeavyField placeholder="Nome social (opcional)" {...register("socialName")} /></div>
-        <div><HeavyField type="date" aria-label="Nascimento" {...register("birthDate")} /><small className="err">{errors.birthDate?.message}</small></div>
-        <div><HeavyField placeholder="CPF" {...register("cpf")} /><small className="err">{errors.cpf?.message}</small></div>
-        <div><HeavyField placeholder="RG" {...register("rg")} /><small className="err">{errors.rg?.message}</small></div>
+        <div><HeavyField type="date" aria-label="Nascimento" {...register("birthDate")} /><small className="err" role="alert">{errors.birthDate?.message}</small></div>
+        <div><HeavyField placeholder="CPF" {...register("cpf")} /><small className="err" role="alert">{errors.cpf?.message}</small></div>
+        <div><HeavyField placeholder="RG" {...register("rg")} /><small className="err" role="alert">{errors.rg?.message}</small></div>
         <div>{sel("gender", "Sexo", ["Masculino", "Feminino", "Outro", "Prefiro não informar"])}</div>
         <div>{sel("maritalStatus", "Estado civil", ["Solteiro(a)", "Casado(a)", "Divorciado(a)", "Viúvo(a)"])}</div>
         <div><HeavyField placeholder="Nacionalidade" {...register("nationality")} /></div>
-        <div><HeavyField placeholder="Nome da mãe" {...register("motherName")} /><small className="err">{errors.motherName?.message}</small></div>
+        <div><HeavyField placeholder="Nome da mãe" {...register("motherName")} /><small className="err" role="alert">{errors.motherName?.message}</small></div>
         <div><HeavyField placeholder="Nome do pai (opcional)" {...register("fatherName")} /></div>
       </div>
 
       <h4>Contato <RenderCounter label="seção" /></h4>
       <div className="form-grid">
-        <div><HeavyField placeholder="E-mail pessoal" {...register("personalEmail")} /><small className="err">{errors.personalEmail?.message}</small></div>
-        <div><HeavyField placeholder="E-mail corporativo" {...register("workEmail")} /><small className="err">{errors.workEmail?.message}</small></div>
-        <div><HeavyField placeholder="Telefone" {...register("phone")} /><small className="err">{errors.phone?.message}</small></div>
-        <div><HeavyField placeholder="Celular" {...register("mobile")} /><small className="err">{errors.mobile?.message}</small></div>
+        <div><HeavyField type="email" placeholder="E-mail pessoal" {...register("personalEmail")} /><small className="err" role="alert">{errors.personalEmail?.message}</small></div>
+        <div><HeavyField type="email" placeholder="E-mail corporativo" {...register("workEmail")} /><small className="err" role="alert">{errors.workEmail?.message}</small></div>
+        <div><HeavyField type="tel" placeholder="Telefone" {...register("phone")} /><small className="err" role="alert">{errors.phone?.message}</small></div>
+        <div><HeavyField type="tel" placeholder="Celular" {...register("mobile")} /><small className="err" role="alert">{errors.mobile?.message}</small></div>
         <div><HeavyField placeholder="Emergência: nome" {...register("emergencyName")} /></div>
         <div><HeavyField placeholder="Emergência: telefone" {...register("emergencyPhone")} /></div>
       </div>
 
       <h4>Endereço <RenderCounter label="seção" /></h4>
       <div className="form-grid">
-        <div><HeavyField placeholder="CEP" {...register("zip")} /><small className="err">{errors.zip?.message}</small></div>
+        <div><HeavyField placeholder="CEP" {...register("zip")} /><small className="err" role="alert">{errors.zip?.message}</small></div>
         <div><HeavyField placeholder="Rua" {...register("street")} /></div>
         <div><HeavyField placeholder="Número" {...register("number")} /></div>
         <div><HeavyField placeholder="Complemento" {...register("complement")} /></div>
         <div><HeavyField placeholder="Bairro" {...register("neighborhood")} /></div>
         <div><HeavyField placeholder="Cidade" {...register("city")} /></div>
-        <div><HeavyField placeholder="UF" {...register("state")} /><small className="err">{errors.state?.message}</small></div>
+        <div><HeavyField placeholder="UF" {...register("state")} /><small className="err" role="alert">{errors.state?.message}</small></div>
       </div>
 
       <h4>Profissional <RenderCounter label="seção" /></h4>
       <div className="form-grid">
         <div><HeavyField placeholder="Cargo" {...register("role")} /></div>
         <div><HeavyField placeholder="Departamento" {...register("department")} /></div>
-        <div><HeavyField placeholder="Salário" {...register("salary")} /><small className="err">{errors.salary?.message}</small></div>
+        <div><HeavyField placeholder="Salário" {...register("salary")} /><small className="err" role="alert">{errors.salary?.message}</small></div>
         <div><HeavyField type="date" aria-label="Admissão" {...register("hireDate")} /></div>
         <div>{sel("contractType", "Contrato", ["CLT", "PJ", "Estágio", "Aprendiz"])}</div>
         <div>{sel("workMode", "Regime", ["Presencial", "Híbrido", "Remoto"])}</div>
@@ -135,17 +135,17 @@ export function FormRhfController() {
       {fields.map((f, i) => (
         <div key={f.id} className="card" style={{ marginBottom: 8 }}>
           <div className="form-grid">
-            <HeavyField placeholder="Nome" {...register(`dependents.${i}.name` as const)} />
+            <HeavyField placeholder="Nome" aria-label={`Nome do dependente ${i + 1}`} {...register(`dependents.${i}.name` as const)} />
             <Controller
               name={`dependents.${i}.kinship` as const}
               control={control}
               render={({ field }) => (
-                <select className="heavy-field" value={field.value ?? ""} onChange={field.onChange} onBlur={field.onBlur} ref={field.ref}>
+                <select className="heavy-field" aria-label={`Parentesco do dependente ${i + 1}`} value={field.value ?? ""} onChange={field.onChange} onBlur={field.onBlur} ref={field.ref}>
                   <option value="">Parentesco…</option><option>Filho(a)</option><option>Cônjuge</option><option>Enteado(a)</option><option>Outro</option>
                 </select>
               )}
             />
-            <HeavyField type="date" aria-label="Nascimento" {...register(`dependents.${i}.birthDate` as const)} />
+            <HeavyField type="date" aria-label={`Nascimento do dependente ${i + 1}`} {...register(`dependents.${i}.birthDate` as const)} />
             <button type="button" className="btn" onClick={() => remove(i)}>Remover</button>
           </div>
         </div>
@@ -163,14 +163,14 @@ export function FormRhfController() {
           </label>
         )}
       />
-      <small className="err">{errors.accept?.message}</small>
+      <small className="err" role="alert">{errors.accept?.message}</small>
       <div className="form-grid" style={{ marginTop: 8 }}>
-        <div><HeavyField type="password" placeholder="Senha" {...register("password")} /><small className="err">{errors.password?.message}</small></div>
-        <div><HeavyField type="password" placeholder="Confirmar senha" {...register("confirmPassword")} /><small className="err">{errors.confirmPassword?.message}</small></div>
+        <div><HeavyField type="password" placeholder="Senha" {...register("password")} /><small className="err" role="alert">{errors.password?.message}</small></div>
+        <div><HeavyField type="password" placeholder="Confirmar senha" {...register("confirmPassword")} /><small className="err" role="alert">{errors.confirmPassword?.message}</small></div>
       </div>
 
       <button type="submit" className="btn btn-good" style={{ marginTop: 12 }}>Validar cadastro</button>
-      {ok && <p style={{ color: "#15803d", fontWeight: 700 }}>{ok}</p>}
+      {ok && <p role="status" style={{ color: "#15803d", fontWeight: 700 }}>{ok}</p>}
     </form>
   );
 }

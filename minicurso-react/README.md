@@ -22,20 +22,40 @@ npm run slides # copia o PDF dos slides (raiz do repo) para public/slides.pdf
 Menu lateral no desktop, abas no topo no mobile. Dá para alternar de 3 jeitos:
 
 - clicando no menu;
-- teclas `0` (início) a `5` (demos) — útil no projetor;
-- URL com hash: `#/`, `#/estilizacao`, `#/formularios`, `#/estado`, `#/dados`, `#/graficos`.
+- teclas `0` (início) a `6` (demos) — útil no projetor;
+- URL com hash: `#/`, `#/estilizacao`, `#/formularios`, `#/estado`, `#/dados`, `#/graficos`, `#/ia`.
 
 A tecla `S` (ou o botão “Slides” no menu) abre o PDF do minicurso embutido ao lado
-das demos — bom para apresentar sem alternar de janela. Com o painel aberto,
-`←`/`→` (ou `PgUp`/`PgDn`) trocam de página; aberto/fechado e página ficam no
-`localStorage` (ou `?slides=1` na URL para já abrir com o painel). O PDF vem de
-`public/slides.pdf` e é desenhado com pdf.js num `<canvas>` — baixa uma vez só e
-trocar de página não pisca. Na barra do painel dá para soltá-lo como uma
-janelinha flutuante na própria página — arraste pela barra, redimensione pelo
-canto — ou em tela cheia (Esc sai); flutuando, a demo usa a tela toda atrás.
-Para atualizar depois de editar os slides, rode `npm run slides`.
+das demos — bom para apresentar sem alternar de janela. No desktop, o menu lateral
+vira um rail de números enquanto os slides estão abertos, e o conteúdo ganha
+espaço; no mobile, o painel ancorado vira uma bottom sheet (fecha no `×` ou no
+`S`). Com o painel aberto, `←`/`→` (ou `PgUp`/`PgDn`) trocam de página;
+aberto/fechado e página ficam no `localStorage` (ou `?slides=1` na URL para já
+abrir com o painel). O PDF vem de `public/slides.pdf` e é desenhado com pdf.js num
+`<canvas>` — baixa uma vez só e trocar de página não pisca. Na barra do painel dá
+para soltá-lo como uma janelinha flutuante na própria página — arraste pela barra,
+redimensione pelo canto — ou em tela cheia (Esc sai); flutuando, a demo usa a tela
+toda atrás e o painel é limitado à viewport também no mobile. Para atualizar
+depois de editar os slides, rode `npm run slides`.
 O `FpsMeter` fica fixo no canto em todas as abas (vermelho abaixo de 30 FPS); com
-o painel de slides aberto, ele muda para o canto esquerdo para não cobrir o PDF.
+o painel de slides aberto no desktop, ele muda para a esquerda, ao lado do rail,
+para não cobrir o PDF.
+
+O DevTools do TanStack Query não aparece mais por padrão (o botão flutuante cobria
+o FPS); para abrir, use `?devtools` na URL.
+
+### Acessibilidade
+
+- `<html lang="pt-BR">`, um `h1` por tela (visualmente oculto no app), título da
+  janela atualizado por aba e link “Pular para o conteúdo”.
+- Foco visível de 2px em todos os controles, com contraste; campos de formulário
+  com borda mais escura e placeholder legível.
+- Formulários com nome acessível em todos os campos (`HeavyField` usa o placeholder
+  como `aria-label` quando não há label), erros com `role="alert"`, tipos
+  `email`/`tel` e selects rotulados.
+- Seletores de versão usam `role="group"` + `aria-pressed`; troca de aba e página
+  dos slides são anunciadas em live regions; botões de copiar e fechar estão em
+  português e o canvas dos slides tem rótulo.
 
 ## O que cada aba mostra
 
@@ -46,13 +66,14 @@ o painel de slides aberto, ele muda para o canto esquerdo para não cobrir o PDF
 | **3. Estado** | Context único × Zustand com seletores (`ticker` a cada 16ms, grade 50/500/2000) | Com ticker ligado + 500 itens, o input trava no Context e fica fluido no Zustand. Só relógio/progresso re-renderizam no bom. |
 | **4. Dados** | `useEffect` à mão × Axios + TanStack Query (jsonplaceholder) | Clique rápido com atraso ligado: race condition no ruim, sem race no bom. Voltar de aba: ruim refaz loading, bom mostra cache + `isFetching`. Mutação com invalidação e rollback otimista (switch “forçar falha”). |
 | **5. Gráficos** | ApexCharts (SVG) × ECharts (Canvas), mesmo dataset 1k / 20k / 100k | Tempo até o primeiro paint medido igual nos dois; FPS no zoom. Apex bonito até ~1k e travando em 20k (100k bloqueado com aviso); ECharts com `dataZoom` + `sampling: lttb` aguenta 100k fluido. |
+| **6. IA** | IA como oráculo × IA como copiloto | Tem que usar — todo dia. A diferença é contexto na entrada e diff revisado na saída: prompt com stack/versão/arquivo, plano antes do código, build+lint+teste antes do aceite. Riscos: alucinação de API, segredo no chat e merge sem leitura. |
 
 ## Estrutura
 
 ```
 src/
   App.tsx                 # menu de navegação (estado local + hash, sem router)
-  main.tsx                # StrictMode desligado + QueryClientProvider + devtools
+  main.tsx                # StrictMode desligado + QueryClientProvider + devtools (?devtools)
   lib/utils.ts            # cn (clsx + tailwind-merge)
   components/
     RenderCounter.tsx     # badge de renders (useRef, durante o render)
@@ -66,9 +87,10 @@ src/
     03-state/             # PRONTO (§6): ContextBad / ZustandGood
     04-data/              # PRONTO (§7): api.ts + AxiosVsFetch + UseEffectBad + UseQueryGood + MutationDemo
     05-charts/            # PRONTO (§8): ApexDemo / EchartsDemo + useRenderTime
+    06-ia/                # tela de fechamento: IA como copiloto (sem interação)
 ```
 
-Todas as 5 demos implementadas. O `HANDOFF.md` (raiz do repo) tem a spec de cada uma.
+As 5 demos + a tela de IA implementadas. O `HANDOFF.md` (raiz do repo) tem a spec de cada demo.
 
 ## Roteiro de apresentação
 
@@ -96,6 +118,9 @@ Todas as 5 demos implementadas. O `HANDOFF.md` (raiz do repo) tem a spec de cada
 - **Gráficos:** suba 1k → 20k → 100k e acompanhe a tabela de tempo. Em 20k o Apex
   engasga (SVG) e em 100k fica bloqueado com aviso; no ECharts dê zoom/arraste o
   slider com 100k e acompanhe o FPS no canto.
+- **IA:** feche dizendo que não é opcional: o mercado cobra IA no fluxo. Passe pelos
+  dois cards (oráculo × copiloto), pelo prompt que funciona e pela régua final — se
+  você não consegue explicar o que a IA escreveu, ainda não terminou.
 
 ## Checklist de aceite (HANDOFF §10)
 

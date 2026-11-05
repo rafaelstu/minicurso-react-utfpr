@@ -17,11 +17,11 @@ export function StateDemo() {
         A maioria só lê <code>theme</code>; poucos leem <code>ticker</code>. Mesmos controles nos dois.
       </p>
 
-      <div className="tabs" role="tablist" aria-label="Versões de estado">
-        <button role="tab" aria-selected={tab === "context"} className={`tab ${tab === "context" ? "active" : ""}`} onClick={() => setTab("context")}>
+      <div className="tabs" role="group" aria-label="Versões de estado">
+        <button aria-pressed={tab === "context"} className={`tab ${tab === "context" ? "active" : ""}`} onClick={() => setTab("context")}>
           Context (ruim)
         </button>
-        <button role="tab" aria-selected={tab === "zustand"} className={`tab ${tab === "zustand" ? "active" : ""}`} onClick={() => setTab("zustand")}>
+        <button aria-pressed={tab === "zustand"} className={`tab ${tab === "zustand" ? "active" : ""}`} onClick={() => setTab("zustand")}>
           Zustand (bom)
         </button>
       </div>

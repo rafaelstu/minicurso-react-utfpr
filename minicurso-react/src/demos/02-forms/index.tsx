@@ -23,14 +23,14 @@ export function FormsDemo() {
         observe o contador geral e o FPS enquanto isso.
       </p>
 
-      <div className="tabs" role="tablist" aria-label="Versões do formulário">
-        <button role="tab" aria-selected={tab === "ruim"} className={`tab ${tab === "ruim" ? "active" : ""}`} onClick={() => setTab("ruim")}>
+      <div className="tabs" role="group" aria-label="Versões do formulário">
+        <button aria-pressed={tab === "ruim"} className={`tab ${tab === "ruim" ? "active" : ""}`} onClick={() => setTab("ruim")}>
           useState (ruim)
         </button>
-        <button role="tab" aria-selected={tab === "register"} className={`tab ${tab === "register" ? "active" : ""}`} onClick={() => setTab("register")}>
+        <button aria-pressed={tab === "register"} className={`tab ${tab === "register" ? "active" : ""}`} onClick={() => setTab("register")}>
           RHF register
         </button>
-        <button role="tab" aria-selected={tab === "controller"} className={`tab ${tab === "controller" ? "active" : ""}`} onClick={() => setTab("controller")}>
+        <button aria-pressed={tab === "controller"} className={`tab ${tab === "controller" ? "active" : ""}`} onClick={() => setTab("controller")}>
           RHF + Controller
         </button>
       </div>

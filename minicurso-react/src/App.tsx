@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FpsMeter } from "./components/FpsMeter";
 import { RenderCounter } from "./components/RenderCounter";
 import { SlidesPanel } from "./components/SlidesPanel";
@@ -7,9 +7,10 @@ import { FormsDemo } from "./demos/02-forms";
 import { StateDemo } from "./demos/03-state";
 import { DataDemo } from "./demos/04-data";
 import { ChartsDemo } from "./demos/05-charts";
+import { IaDemo } from "./demos/06-ia";
 import "./App.css";
 
-type DemoId = "inicio" | "estilizacao" | "formularios" | "estado" | "dados" | "graficos";
+type DemoId = "inicio" | "estilizacao" | "formularios" | "estado" | "dados" | "graficos" | "ia";
 
 const DEMOS: { id: DemoId; numero: string; titulo: string; subtitulo: string }[] = [
   { id: "inicio", numero: "●", titulo: "Início", subtitulo: "Roteiro da apresentação" },
@@ -18,15 +19,19 @@ const DEMOS: { id: DemoId; numero: string; titulo: string; subtitulo: string }[]
   { id: "estado", numero: "3", titulo: "Estado", subtitulo: "Context × Zustand" },
   { id: "dados", numero: "4", titulo: "Dados", subtitulo: "useEffect × TanStack Query" },
   { id: "graficos", numero: "5", titulo: "Gráficos", subtitulo: "Apex × ECharts" },
+  { id: "ia", numero: "6", titulo: "IA", subtitulo: "copiloto, não oráculo" },
 ];
 
 const SLIDES_OPEN_KEY = "minicurso:slides:open";
 const SLIDES_PAGE_KEY = "minicurso:slides:page";
 const SLIDES_FLOAT_KEY = "minicurso:slides:float";
 
-function idFromHash(): DemoId {
-  const slug = window.location.hash.replace("#/", "").replace("#", "");
-  return (DEMOS.some((d) => d.id === slug) ? slug : "inicio") as DemoId;
+// Só considera hashes de demos: âncoras como #conteudo (skip link) não trocam a aba.
+// Hash vazio (ou "#/") é o Início, para o botão voltar do navegador funcionar.
+function idFromHash(): DemoId | null {
+  const slug = window.location.hash.replace(/^#\/?/, "");
+  if (!slug) return "inicio";
+  return DEMOS.some((d) => d.id === slug) ? (slug as DemoId) : null;
 }
 
 function Inicio() {
@@ -39,7 +44,7 @@ function Inicio() {
       <p className="muted">
         Cada aba tem uma versão <strong>ruim</strong> (tutorial / legado) e uma <strong>boa</strong>{" "}
         (padrão atual). O problema da versão ruim é visível: contador de renders, FPS, lag ao
-        digitar. Use as teclas <kbd>1</kbd>–<kbd>5</kbd> ou <kbd>0</kbd> para trocar de aba no
+        digitar. Use as teclas <kbd>1</kbd>–<kbd>6</kbd> ou <kbd>0</kbd> para trocar de aba no
         projetor e <kbd>S</kbd> para abrir os slides ao lado. A URL também funciona:{" "}
         <code>#/estado</code>, <code>#/dados</code>, etc.
       </p>
@@ -60,6 +65,7 @@ function Inicio() {
           <li>Estado: ligue o ticker com 500+ itens, digite no input — Context trava, Zustand não.</li>
           <li>Dados: clique rápido entre posts com atraso ligado — race condition vs. cache.</li>
           <li>Gráficos: suba de 1k → 20k → 100k pontos — SVG sofre, Canvas aguenta.</li>
+          <li>IA: use todo dia como copiloto — contexto, plano e diff revisado antes do merge.</li>
         </ol>
       </div>
     </section>
@@ -67,7 +73,8 @@ function Inicio() {
 }
 
 export default function App() {
-  const [active, setActive] = useState<DemoId>(() => idFromHash());
+  const [active, setActive] = useState<DemoId>(() => idFromHash() ?? "inicio");
+  const navRef = useRef<HTMLElement | null>(null);
   const [slidesOpen, setSlidesOpen] = useState(() => {
     const forced = new URLSearchParams(window.location.search).get("slides");
     if (forced !== null) return forced !== "0";
@@ -88,10 +95,28 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const onHash = () => setActive(idFromHash());
+    const onHash = () => {
+      const next = idFromHash();
+      if (next) setActive(next);
+    };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+
+  // Título da janela e anúncio da aba atual para leitores de tela.
+  useEffect(() => {
+    const demo = DEMOS.find((d) => d.id === active);
+    document.title = `${demo?.titulo ?? "Início"} — Minicurso React`;
+  }, [active]);
+
+  // No mobile a navegação rola na horizontal: mantém a aba ativa visível.
+  useEffect(() => {
+    navRef.current
+      ?.querySelector<HTMLElement>(".nav-btn.active")
+      ?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [active]);
+
+  const currentDemo = DEMOS.find((d) => d.id === active);
 
   // Painel de slides: lembra aberto/fechado, flutuante e a página entre visitas
   useEffect(() => {
@@ -106,18 +131,19 @@ export default function App() {
     setSlidePage((p) => Math.min(p, n));
   }, []);
 
-  // Atalhos de teclado p/ apresentação: 0 = início, 1..5 = demos,
+  // Atalhos de teclado p/ apresentação: 0 = início, 1..6 = demos,
   // S = painel de slides, ←/→ e PgUp/PgDn = página (só com o painel aberto)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Não rouba atalhos do navegador (Ctrl/Cmd/Alt) nem de campos e diálogos.
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement ||
-        e.target instanceof HTMLSelectElement
+        e.target instanceof Element &&
+        e.target.closest("input, textarea, select, [contenteditable='true'], [role='dialog']")
       )
         return;
-      const order: DemoId[] = ["inicio", "estilizacao", "formularios", "estado", "dados", "graficos"];
-      if (e.key >= "0" && e.key <= "5") {
+      const order: DemoId[] = ["inicio", "estilizacao", "formularios", "estado", "dados", "graficos", "ia"];
+      if (e.key >= "0" && e.key <= "6") {
         go(order[Number(e.key)]);
         return;
       }
@@ -125,7 +151,7 @@ export default function App() {
         setSlidesOpen((v) => !v);
         return;
       }
-      if (!slidesOpen) return;
+      if (!slidesOpen || !slidesTotal) return;
       if (e.key === "ArrowRight" || e.key === "PageDown") {
         e.preventDefault();
         setSlidePage((p) => Math.min(p + 1, slidesTotal ?? p + 1));
@@ -152,6 +178,9 @@ export default function App() {
 
   return (
     <div className={`layout ${slidesOpen && !slidesFloating ? "slides-open" : ""}`}>
+      <a className="skip-link" href="#conteudo">
+        Pular para o conteúdo
+      </a>
       <aside className="sidebar">
         <div className="brand">
           <span className="brand-dot" aria-hidden />
@@ -160,13 +189,14 @@ export default function App() {
             <span className="muted">tutorial → mercado</span>
           </div>
         </div>
-        <nav aria-label="Demos do minicurso">
+        <nav ref={navRef} aria-label="Demos e slides do minicurso">
           {DEMOS.map((d) => (
             <button
               key={d.id}
               type="button"
               onClick={() => go(d.id)}
               aria-current={active === d.id ? "page" : undefined}
+              aria-label={`${d.titulo} — ${d.subtitulo}`}
               className={`nav-btn ${active === d.id ? "active" : ""}`}
             >
               <span className="nav-num">{d.numero}</span>
@@ -176,31 +206,37 @@ export default function App() {
               </span>
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setSlidesOpen((v) => !v)}
+            aria-pressed={slidesOpen}
+            aria-label={slidesOpen ? "Fechar painel de slides" : "Abrir painel de slides"}
+            className={`nav-btn ${slidesOpen ? "active" : ""}`}
+          >
+            <span className="nav-num">S</span>
+            <span className="nav-text">
+              <strong>Slides</strong>
+              <small>{slidesOpen ? "fechar painel" : "PDF lado a lado"}</small>
+            </span>
+          </button>
         </nav>
-        <button
-          type="button"
-          onClick={() => setSlidesOpen((v) => !v)}
-          aria-pressed={slidesOpen}
-          className={`nav-btn ${slidesOpen ? "active" : ""}`}
-        >
-          <span className="nav-num">S</span>
-          <span className="nav-text">
-            <strong>Slides</strong>
-            <small>{slidesOpen ? "fechar painel" : "PDF lado a lado"}</small>
-          </span>
-        </button>
         <p className="muted sidebar-hint">
-          Atalhos <kbd>0</kbd>–<kbd>5</kbd> • <kbd>S</kbd> slides • URL <code>#/demo</code>
+          Atalhos <kbd>0</kbd>–<kbd>6</kbd> • <kbd>S</kbd> slides • URL <code>#/demo</code>
         </p>
       </aside>
 
-      <main className="content">
+      <main className="content" id="conteudo" tabIndex={-1}>
+        <h1 className="sr-only">Minicurso React — do tutorial ao mercado</h1>
+        <p className="sr-only" role="status" aria-live="polite">
+          Tela atual: {currentDemo?.titulo}
+        </p>
         {active === "inicio" && <Inicio />}
         {active === "estilizacao" && <StylingDemo />}
         {active === "formularios" && <FormsDemo />}
         {active === "estado" && <StateDemo />}
         {active === "dados" && <DataDemo />}
         {active === "graficos" && <ChartsDemo />}
+        {active === "ia" && <IaDemo />}
       </main>
 
       {slidesPanel}
